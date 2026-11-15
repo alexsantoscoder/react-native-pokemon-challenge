@@ -1,9 +1,6 @@
 // Navigation primitives and route definitions
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ROUTES } from "@/navigation/routes";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { StyleSheet } from "react-native";
-import { COLORS } from "@/config/theme";
 import type { MainTabParamList } from "@/navigation/types";
 
 // Feature navigators and flow entry screens
@@ -28,5 +25,4 @@ const MainNavigator = () => {
     );
 }
  
-
 export default MainNavigator;
