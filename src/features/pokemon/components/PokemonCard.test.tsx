@@ -22,6 +22,8 @@ import PokemonCard from "./PokemonCard";
 // Models
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
+jest.mock("@expo/vector-icons/Ionicons", () => () => null);
+
 // Mock Pokémon data.
 const mockPokemon: Pokemon = {
   id: 1,

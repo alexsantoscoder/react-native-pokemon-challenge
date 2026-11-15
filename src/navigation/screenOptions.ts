@@ -1,7 +1,12 @@
-export const SCREEN_OPTIONS = {
-    headerStyle: { backgroundColor: '#000000' },
-    headerTintColor: '#FFFFFF',
-    contentStyle: { backgroundColor: '#ffffff' },
+import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { COLORS } from "@/config/theme";
+
+export const SCREEN_OPTIONS: NativeStackNavigationOptions = {
+    headerStyle: { backgroundColor: COLORS.background },
+    headerTintColor: COLORS.text,
+    headerShadowVisible: false,
+    headerBackButtonDisplayMode: "minimal",
+    contentStyle: { backgroundColor: COLORS.background },
     headerTitle: '',
 };
 

@@ -1,4 +1,5 @@
 
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
 } from "react-native";
 
 import { memo } from "react";
+import { COLORS } from "@/config/theme";
 import type {
   Pokemon,
 } from "@/features/pokemon/models/Pokemon";
@@ -31,7 +33,7 @@ const PokemonCard = ({
 
   return (
     <Pressable
-      style={styles.card}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       onPress={() => onPress(pokemon.id)}
       accessibilityRole="button"
       accessibilityLabel={`View ${pokemon.name} details`}
@@ -43,7 +45,7 @@ const PokemonCard = ({
         accessibilityLabel={pokemon.name}
       />
 
-      <View>
+      <View style={styles.identity}>
         <Text style={styles.name}>
           {pokemon.name}
         </Text>
@@ -52,6 +54,13 @@ const PokemonCard = ({
           #{String(pokemon.id).padStart(3, "0")}
         </Text>
       </View>
+
+      <Ionicons
+        name="chevron-forward"
+        size={20}
+        color={COLORS.textSecondary}
+        accessible={false}
+      />
     </Pressable>
   );
 };
@@ -60,23 +69,33 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F5F5F5",
-    borderRadius: 12,
-    padding: 16,
-    gap: 16,
+    backgroundColor: COLORS.card,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 12,
+    gap: 14,
+  },
+  cardPressed: {
+    backgroundColor: COLORS.surface,
   },
   image: {
-    width: 90,
-    height: 90,
+    width: 84,
+    height: 84,
+  },
+  identity: {
+    flex: 1,
   },
   name: {
-    fontSize: 18,
-    fontWeight: "600",
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: "700",
     textTransform: "capitalize",
   },
   number: {
     fontSize: 14,
-    color: "#666666",
+    color: COLORS.textSecondary,
+    fontVariant: ["tabular-nums"],
     marginTop: 4,
   },
 });

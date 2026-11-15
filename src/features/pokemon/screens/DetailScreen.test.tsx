@@ -32,6 +32,8 @@ import { ROUTES } from "@/navigation/routes";
 // Models
 import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 
+jest.mock("@expo/vector-icons/Ionicons", () => () => null);
+
 // Mock the hook without loading SQLite dependencies.
 jest.mock("@/features/pokemon/hooks/usePokemonDetail", () => ({
   usePokemonDetail: jest.fn(),

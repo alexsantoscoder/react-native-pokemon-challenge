@@ -16,11 +16,25 @@ import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider } from "expo-sqlite";
 
 // Navigation
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer } from "@react-navigation/native";
+import { COLORS } from "@/config/theme";
 import MainNavigator from "@/navigation/MainNavigator";
 
 // Database
 import { initializeDatabase } from "@/db/database";
+
+const navigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: COLORS.primary,
+    background: COLORS.background,
+    card: COLORS.backgroundSecondary,
+    text: COLORS.text,
+    border: COLORS.border,
+    notification: COLORS.error,
+  },
+};
 
 // Configure native splash screen fade-out animation.
 SplashScreen.setOptions({
@@ -37,6 +51,7 @@ export default function App() {
       databaseName="pokemon.db"
       onInit={initializeDatabase}>
       <NavigationContainer
+        theme={navigationTheme}
         onReady={() => {
           void SplashScreen.hideAsync();
         }}>

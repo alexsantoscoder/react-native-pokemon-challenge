@@ -33,10 +33,19 @@ import { ROUTES } from "@/navigation/routes";
 // Models
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
+jest.mock("@expo/vector-icons/Ionicons", () => () => null);
+
 // Mock the hook without loading its actual implementation.
 jest.mock("@/features/pokemon/hooks/usePokemonList", () => ({
   usePokemonList: jest.fn(),
 }));
+
+jest.mock("react-native-safe-area-context", () => {
+  const { default: mockSafeAreaContext } = jest.requireActual(
+    "react-native-safe-area-context/jest/mock"
+  );
+  return mockSafeAreaContext;
+});
 
 // Typed mocked hook.
 const mockUsePokemonList = jest.mocked(usePokemonList);

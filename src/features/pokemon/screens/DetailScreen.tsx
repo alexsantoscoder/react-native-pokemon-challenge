@@ -1,28 +1,21 @@
-
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
-  View,
-  Text,
   Image,
   ScrollView,
-  Pressable,
-  ActivityIndicator,
   StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 
-// Navigation
+import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
+import PokemonScreenState from "@/features/pokemon/components/PokemonScreenState";
+import { usePokemonDetail } from "@/features/pokemon/hooks/usePokemonDetail";
 import { ROUTES } from "@/navigation/routes";
 import type { PokemonScreenProps } from "@/navigation/types";
 
-// Pokémon feature
-import { usePokemonDetail } from "@/features/pokemon/hooks/usePokemonDetail";
+type ScreenProps = PokemonScreenProps<typeof ROUTES.POKEMON.DETAIL>;
 
-type ScreenProps = PokemonScreenProps<
-  typeof ROUTES.POKEMON.DETAIL
->;
-
-/**
- * Human-readable labels for Pokémon statistics.
- */
 const STAT_LABELS: Record<string, string> = {
   hp: "HP",
   attack: "Attack",
@@ -32,172 +25,132 @@ const STAT_LABELS: Record<string, string> = {
   speed: "Speed",
 };
 
-/**
- * DetailScreen - Displays information about
- * the selected Pokémon.
- *
- * Responsibilities:
- * 1. Retrieves the selected Pokémon ID.
- * 2. Displays Pokémon attributes and base stats.
- * 3. Handles loading, error, and retry states.
- */
+const TYPE_COLORS = new Map([
+  ["normal", "#C6BDAE"],
+  ["fire", "#FFA477"],
+  ["water", "#8ABCF6"],
+  ["electric", "#E9CD68"],
+  ["grass", "#9BCB83"],
+  ["ice", "#9CDCDD"],
+  ["fighting", "#E99A91"],
+  ["poison", "#CAA2E3"],
+  ["ground", "#D7B485"],
+  ["flying", "#B0B9EC"],
+  ["psychic", "#F0A0BA"],
+  ["bug", "#BACA73"],
+  ["rock", "#D5C28B"],
+  ["ghost", "#B9A5DC"],
+  ["dragon", "#B7A8F2"],
+  ["dark", "#BBA9A5"],
+  ["steel", "#B8C1CC"],
+  ["fairy", "#E7ADD1"],
+]);
+
 const DetailScreen = ({ route }: ScreenProps) => {
+  const { pokemon, isLoading, error, refetch } = usePokemonDetail(route.params.pokemonId);
+  const { fontScale } = useWindowDimensions();
 
-  const { pokemonId } = route.params;
-
-  const {
-    pokemon,
-    isLoading,
-    error,
-    refetch,
-  } = usePokemonDetail(pokemonId);
-
-  // Loading state
   if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-        <Text>Loading Pokémon details...</Text>
-      </View>
-    );
+    return <PokemonScreenState kind="loading" message="Loading Pokémon details..." />;
   }
 
-  // Error state
   if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>{error}</Text>
-
-        <Pressable
-          style={styles.retryButton}
-          onPress={refetch}
-          accessibilityRole="button"
-        >
-          <Text style={styles.retryText}>Try again</Text>
-        </Pressable>
-      </View>
-    );
+    return <PokemonScreenState kind="error" message={error} onRetry={refetch} />;
   }
 
-  // Empty state
   if (!pokemon) {
-    return (
-      <View style={styles.center}>
-        <Text>Pokémon details not found.</Text>
-      </View>
-    );
+    return <PokemonScreenState kind="empty" message="Pokémon details not found." />;
   }
+
+  const attributes = [
+    { label: "Height", value: `${pokemon.height.toFixed(1)} m`, icon: "resize-outline" },
+    { label: "Weight", value: `${pokemon.weight.toFixed(1)} kg`, icon: "scale-outline" },
+    { label: "Base XP", value: pokemon.baseExperience, icon: "flash-outline" },
+  ] as const;
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
+      indicatorStyle="white"
     >
+      <View style={styles.hero}>
+        {!!pokemon.image && (
+          <Image
+            source={{ uri: pokemon.image }}
+            style={styles.image}
+            resizeMode="contain"
+            accessibilityLabel={`${pokemon.name} artwork`}
+          />
+        )}
 
-      {/* Pokémon artwork */}
-      {pokemon.image ? (
-        <Image
-          source={{ uri: pokemon.image }}
-          style={styles.image}
-          resizeMode="contain"
-          accessibilityLabel={`${pokemon.name} artwork`}
-        />
-      ) : null}
+        <Text style={styles.number}>#{String(pokemon.id).padStart(3, "0")}</Text>
+        <Text accessibilityRole="header" style={styles.name}>{pokemon.name}</Text>
 
-      {/* Pokémon name and number */}
-      <Text style={styles.number}>
-        #{String(pokemon.id).padStart(3, "0")}
-      </Text>
-
-      <Text style={styles.name}>
-        {pokemon.name}
-      </Text>
-
-      {/* Pokémon types */}
-      <View style={styles.types}>
-        {pokemon.types.map((type) => (
-          <View key={type} style={styles.typeBadge}>
-            <Text style={styles.typeText}>
-              {type}
-            </Text>
+        {pokemon.types.length > 0 && (
+          <View style={styles.types}>
+            {pokemon.types.map((type) => {
+              const color = TYPE_COLORS.get(type) ?? COLORS.textSecondary;
+              return (
+                <View
+                  key={type}
+                  style={[styles.typeBadge, { backgroundColor: `${color}1A`, borderColor: `${color}40` }]}
+                >
+                  <Text style={[styles.typeText, { color }]}>{type}</Text>
+                </View>
+              );
+            })}
           </View>
-        ))}
+        )}
       </View>
 
-      {/* Physical attributes */}
       <View style={styles.attributes}>
-
-        <View style={styles.attribute}>
-          <Text style={styles.label}>Height</Text>
-          <Text style={styles.value}>
-            {pokemon.height.toFixed(1)} m
-          </Text>
-        </View>
-
-        <View style={styles.attribute}>
-          <Text style={styles.label}>Weight</Text>
-          <Text style={styles.value}>
-            {pokemon.weight.toFixed(1)} kg
-          </Text>
-        </View>
-
-        <View style={styles.attribute}>
-          <Text style={styles.label}>Base XP</Text>
-          <Text style={styles.value}>
-            {pokemon.baseExperience}
-          </Text>
-        </View>
-
-      </View>
-
-      {/* Pokémon abilities */}
-      <Text style={styles.sectionTitle}>
-        Abilities
-      </Text>
-
-      <View style={styles.abilities}>
-        {pokemon.abilities.map((ability) => (
-          <View key={ability} style={styles.abilityBadge}>
-            <Text style={styles.abilityText}>
-              {ability.replace(/-/g, " ")}
-            </Text>
+        {attributes.map(({ label, value, icon }) => (
+          <View key={label} style={[styles.attribute, { flexBasis: 88 * fontScale }]}>
+            <Ionicons name={icon} size={20} color={COLORS.textSecondary} accessible={false} />
+            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.value}>{value}</Text>
           </View>
         ))}
       </View>
 
-      {/* Pokémon base stats */}
-      <Text style={styles.sectionTitle}>
-        Base Stats
-      </Text>
-
-      {pokemon.stats.map((stat) => (
-        <View key={stat.name} style={styles.statRow}>
-
-          <Text style={styles.statLabel}>
-            {STAT_LABELS[stat.name] ?? stat.name}
-          </Text>
-
-          <View style={styles.statTrack}>
-            <View
-              style={[
-                styles.statFill,
-                {
-                  width: `${Math.min(
-                    Math.max((stat.value / 255) * 100, 0),
-                    100
-                  )}%`,
-                },
-              ]}
-            />
-          </View>
-
-          <Text style={styles.statValue}>
-            {stat.value}
-          </Text>
-
+      <View style={styles.section}>
+        <View style={styles.sectionHeading}>
+          <Ionicons name="layers-outline" size={20} color={COLORS.textSecondary} accessible={false} />
+          <Text accessibilityRole="header" style={styles.sectionTitle}>Abilities</Text>
         </View>
-      ))}
+        <View style={styles.abilities}>
+          {pokemon.abilities.map((ability) => (
+            <View key={ability} style={styles.abilityBadge}>
+              <Text style={styles.abilityText}>{ability.replace(/-/g, " ")}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
 
+      <View style={styles.section}>
+        <View style={styles.sectionHeading}>
+          <Ionicons name="stats-chart-outline" size={20} color={COLORS.textSecondary} accessible={false} />
+          <Text accessibilityRole="header" style={styles.sectionTitle}>Base Stats</Text>
+        </View>
+        <View style={styles.stats}>
+          {pokemon.stats.map((stat) => {
+            const fill = Math.min(Math.max((stat.value / 255) * 100, 0), 100);
+
+            return (
+              <View key={stat.name} style={styles.stat}>
+                <View style={styles.statHeading}>
+                  <Text style={styles.statLabel}>{STAT_LABELS[stat.name] ?? stat.name}</Text>
+                  <Text style={styles.statValue}>{stat.value}</Text>
+                </View>
+                <View style={styles.statTrack} accessible={false}>
+                  <View style={[styles.statFill, { width: `${fill}%` }]} />
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      </View>
     </ScrollView>
   );
 };
@@ -205,80 +158,98 @@ const DetailScreen = ({ route }: ScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.background,
   },
   content: {
-    padding: 20,
-    paddingBottom: 40,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 32,
+    gap: 24,
   },
-  center: {
-    flex: 1,
+  hero: {
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-    gap: 12,
+    gap: 6,
   },
   image: {
     width: "100%",
     height: 260,
+    marginBottom: 8,
   },
   number: {
-    fontSize: 16,
-    color: "#777777",
-    textAlign: "center",
-    marginTop: 12,
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontVariant: ["tabular-nums"],
   },
   name: {
-    fontSize: 30,
-    fontWeight: "700",
+    color: COLORS.text,
+    fontSize: 36,
+    fontWeight: "800",
     textAlign: "center",
     textTransform: "capitalize",
-    marginTop: 4,
   },
   types: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 8,
-    marginTop: 16,
+    marginTop: 8,
   },
   typeBadge: {
-    backgroundColor: "#E8F1FF",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
   },
   typeText: {
-    color: "#2454A6",
+    fontSize: 14,
     fontWeight: "600",
     textTransform: "capitalize",
   },
   attributes: {
     flexDirection: "row",
-    backgroundColor: "#F5F5F5",
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 24,
+    flexWrap: "wrap",
     gap: 8,
   },
   attribute: {
-    flex: 1,
+    flexGrow: 1,
+    maxWidth: "100%",
     alignItems: "center",
     gap: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   label: {
-    color: "#666666",
+    color: COLORS.textSecondary,
     fontSize: 13,
+    textAlign: "center",
   },
   value: {
-    fontSize: 16,
-    fontWeight: "600",
+    color: COLORS.text,
+    fontSize: 17,
+    fontWeight: "700",
+    textAlign: "center",
+    fontVariant: ["tabular-nums"],
+  },
+  section: {
+    gap: 12,
+  },
+  sectionHeading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   sectionTitle: {
+    flexShrink: 1,
+    color: COLORS.text,
     fontSize: 20,
     fontWeight: "700",
-    marginTop: 28,
-    marginBottom: 14,
   },
   abilities: {
     flexDirection: "row",
@@ -286,57 +257,57 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   abilityBadge: {
-    backgroundColor: "#F0F0F0",
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderWidth: 1,
     borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   abilityText: {
-    textTransform: "capitalize",
+    color: COLORS.text,
+    fontSize: 14,
     fontWeight: "500",
+    textTransform: "capitalize",
   },
-  statRow: {
+  stats: {
+    gap: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 18,
+    backgroundColor: COLORS.card,
+  },
+  stat: {
+    gap: 6,
+  },
+  statHeading: {
     flexDirection: "row",
-    alignItems: "center",
+    justifyContent: "space-between",
+    alignItems: "baseline",
     gap: 12,
-    marginBottom: 14,
   },
   statLabel: {
-    width: 90,
-    fontSize: 12,
-    color: "#555555",
+    flexShrink: 1,
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  statValue: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
   },
   statTrack: {
-    flex: 1,
-    height: 10,
-    backgroundColor: "#E6E6E6",
-    borderRadius: 5,
+    height: 8,
+    borderRadius: 4,
     overflow: "hidden",
+    backgroundColor: COLORS.divider,
   },
   statFill: {
     height: "100%",
-    backgroundColor: "#54B78A",
-    borderRadius: 5,
-  },
-  statValue: {
-    width: 30,
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "right",
-  },
-  errorText: {
-    color: "#B42318",
-    textAlign: "center",
-  },
-  retryButton: {
-    backgroundColor: "#222222",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  retryText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
   },
 });
 

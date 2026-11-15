@@ -21,6 +21,7 @@ const PokemonNavigator = () => {
 
             <Stack.Screen
                 component={ListScreen}
+                options={{ headerShown: false }}
                 name={ROUTES.POKEMON.LIST}/>
 
             <Stack.Screen

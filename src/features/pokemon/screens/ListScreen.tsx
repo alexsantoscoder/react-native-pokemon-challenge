@@ -1,148 +1,87 @@
-
-import {
-    View,
-    Text,
-    Pressable,
-    FlatList,
-    ActivityIndicator,
-    StyleSheet,
-} from "react-native";
-
 import { useCallback } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Navigation
+import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
+import PokemonCard from "@/features/pokemon/components/PokemonCard";
+import PokemonScreenState from "@/features/pokemon/components/PokemonScreenState";
+import { usePokemonList } from "@/features/pokemon/hooks/usePokemonList";
 import { ROUTES } from "@/navigation/routes";
 import type { PokemonScreenProps } from "@/navigation/types";
 
-// Pokémon feature
-import PokemonCard from "@/features/pokemon/components/PokemonCard";
-import { usePokemonList } from "@/features/pokemon/hooks/usePokemonList";
-
-import type {
-    Pokemon,
-} from "@/features/pokemon/models/Pokemon";
-
 type ScreenProps = PokemonScreenProps<typeof ROUTES.POKEMON.LIST>;
 
-/**
- * ListScreen - Displays the first 20 Pokémon.
- *
- * Responsibilities:
- * 1. Displays the Pokémon list.
- * 2. Handles loading, error, and empty states.
- * 3. Navigates to the selected Pokémon's detail screen.
- */
 const ListScreen = ({ navigation }: ScreenProps) => {
+  const { pokemon, isLoading, error, refetch } = usePokemonList();
+  const { top, left, right } = useSafeAreaInsets();
 
-    const {
-        pokemon,
-        isLoading,
-        error,
-        refetch,
-    } = usePokemonList();
+  const gotoDetail = useCallback((pokemonId: number) => {
+    navigation.navigate(ROUTES.POKEMON.DETAIL, { pokemonId });
+  }, [navigation]);
 
-    /**
-     * Navigates to the selected Pokémon's detail screen.
-     */
+  return (
+    <View style={[styles.container, { paddingTop: top, paddingLeft: left, paddingRight: right }]}>
+      <View style={styles.header}>
+        <Text accessibilityRole="header" style={styles.title}>Pokedex</Text>
+        {!isLoading && !error && pokemon.length > 0 && (
+          <Text style={styles.count}>
+            {pokemon.length} {pokemon.length === 1 ? "entry" : "entries"}
+          </Text>
+        )}
+      </View>
 
-    const gotoDetail = useCallback((pokemonId: number) => {
-        navigation.navigate(ROUTES.POKEMON.DETAIL, {
-            pokemonId,
-        });
-    }, [navigation]);
-
-    // Loading state
-    if (isLoading) {
-        return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" />
-                <Text>Loading Pokémon...</Text>
-            </View>
-        );
-    }
-
-    // Error state
-    if (error) {
-        return (
-            <View style={styles.center}>
-                <Text style={styles.errorText}>{error}</Text>
-
-                <Pressable
-                    style={styles.retryButton}
-                    onPress={refetch}
-                    accessibilityRole="button">
-                    <Text style={styles.retryText}>
-                        Try again
-                    </Text>
-                </Pressable>
-            </View>
-        );
-    }
-
-
-   
-
-    // Pokémon list
-    return (
-        <View style={styles.container}>
-
-            <FlatList
-
-                data={pokemon}
-
-                keyExtractor={(item) => item.id.toString()}
-
-                renderItem={ ({ item }: { item: Pokemon }) => <PokemonCard pokemon={item} onPress={gotoDetail}/>}
-
-                contentContainerStyle={styles.list}
-                
-                initialNumToRender={20}
-
-                maxToRenderPerBatch={20}
-                
-                windowSize={2}
-
-                ListEmptyComponent={
-                    <Text>No Pokémon found.</Text>
-                }
-            />
-
-        </View>
-    );
+      {isLoading ? (
+        <PokemonScreenState kind="loading" message="Loading Pokémon..." />
+      ) : error ? (
+        <PokemonScreenState kind="error" message={error} onRetry={refetch} />
+      ) : pokemon.length === 0 ? (
+        <PokemonScreenState kind="empty" message="No Pokémon found." />
+      ) : (
+        <FlatList
+          data={pokemon}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <PokemonCard pokemon={item} onPress={gotoDetail} />}
+          contentContainerStyle={styles.list}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
+          windowSize={2}
+        />
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#FFFFFF",
-    },
-    center: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        gap: 12,
-    },
-    list: {
-        padding: 16,
-        gap: 12,
-        flexGrow: 1,
-    },
-    errorText: {
-        color: "#B42318",
-        textAlign: "center",
-        fontWeight:500
-    },
-    retryButton: {
-        backgroundColor: "#222222",
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    retryText: {
-        color: "#FFFFFF",
-        fontWeight: "600",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 16,
+    gap: 4,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 32,
+    fontWeight: "800",
+  },
+  count: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  list: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: CONTENT_MAX_WIDTH,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+    gap: 12,
+  },
 });
 
 export default ListScreen;
