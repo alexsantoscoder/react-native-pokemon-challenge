@@ -3,7 +3,7 @@
  * ListApi - Retrieves Pokémon list data from PokéAPI.
  */
 
-const API_BASE_URL = "https://pokeapi.co/api/v2";
+import { API_BASE_URL } from "@/config/api";
 
 /**
  * Represents a Pokémon entry returned by PokéAPI.

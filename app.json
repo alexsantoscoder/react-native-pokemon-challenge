@@ -41,7 +41,8 @@
             "imageWidth": 150
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ]
   }
 }

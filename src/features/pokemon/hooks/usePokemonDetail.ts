@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useSQLiteContext } from "expo-sqlite";
 
 import { getPokemonDetail } from "@/features/pokemon/repositories/detailRepository";
 
@@ -8,10 +9,16 @@ import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 /**
  * usePokemonDetail - Manages Pokémon detail state.
  *
- * Handles fetching by ID, loading, errors,
- * cancellation, and retry functionality.
+ * Handles:
+ * 1. Fetching Pokémon details by ID.
+ * 2. Loading and error states.
+ * 3. Request cancellation.
+ * 4. Manual retries.
  */
 export function usePokemonDetail(pokemonId: number) {
+
+  // Access the shared SQLite database.
+  const db = useSQLiteContext();
 
   const [pokemon, setPokemon] = useState<PokemonDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +38,7 @@ export function usePokemonDetail(pokemonId: number) {
       try {
 
         const data = await getPokemonDetail(
+          db,
           pokemonId,
           controller.signal
         );
@@ -57,14 +65,14 @@ export function usePokemonDetail(pokemonId: number) {
 
     void loadPokemonDetail();
 
-    // Cancel stale requests when the ID changes or
-    // the screen unmounts.
+    // Cancel pending requests when the Pokémon ID
+    // changes or the screen unmounts.
     return () => controller.abort();
 
-  }, [pokemonId, retryCount]);
+  }, [db, pokemonId, retryCount]);
 
   /**
-   * Triggers another request for Pokémon details.
+   * Triggers another detail request.
    */
   function refetch() {
     setRetryCount((current) => current + 1);

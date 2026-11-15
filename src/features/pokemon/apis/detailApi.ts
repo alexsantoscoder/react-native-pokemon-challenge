@@ -3,8 +3,7 @@
  * DetailApi - Retrieves individual Pokémon data
  * from PokéAPI.
  */
-
-const API_BASE_URL = "https://pokeapi.co/api/v2";
+import { API_BASE_URL } from "@/config/api";
 
 interface NamedResource {
   name: string;

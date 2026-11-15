@@ -1,34 +1,75 @@
 
+import type { SQLiteDatabase } from "expo-sqlite";
+
 import { fetchPokemonList } from "@/features/pokemon/apis/listApi";
+
+import {
+  savePokemonList,
+  getCachedPokemonList,
+} from "@/features/pokemon/storage/pokemonStorage";
 
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
 /**
- * ListRepository - Retrieves and transforms Pokémon
- * list data into application models.
+ * ListRepository - Retrieves Pokémon from PokéAPI
+ * and provides a SQLite fallback when offline.
  */
 export async function getPokemonList(
+  db: SQLiteDatabase,
   signal?: AbortSignal
 ): Promise<Pokemon[]> {
 
-  const data = await fetchPokemonList(signal);
+  try {
 
-  return data.results.map((item): Pokemon => {
+    // Fetch fresh Pokémon data.
+    const data = await fetchPokemonList(signal);
 
-    // Extract the Pokémon ID from its API URL.
-    const match = item.url.match(/\/pokemon\/(\d+)\/?$/);
+    const pokemon = data.results.map((item): Pokemon => {
 
-    if (!match) {
-      throw new Error(`Invalid Pokémon URL: ${item.url}`);
+      const match = item.url.match(/\/pokemon\/(\d+)\/?$/);
+
+      if (!match) {
+        throw new Error(`Invalid Pokémon URL: ${item.url}`);
+      }
+
+      const id = Number(match[1]);
+
+      return {
+        id,
+        name: item.name,
+        image:
+          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+      };
+    });
+
+    // Do not cache data from a cancelled request.
+    if (signal?.aborted) {
+      throw new Error("Request cancelled");
     }
 
-    const id = Number(match[1]);
+    // Cache successful responses without blocking display.
+    try {
+      await savePokemonList(db, pokemon);
+    } catch (cacheError) {
+      console.warn("Unable to cache Pokémon list:", cacheError);
+    }
 
-    return {
-      id,
-      name: item.name,
-      image:
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-    };
-  });
+    return pokemon;
+
+  } catch (error) {
+
+    // Cancellation should not trigger an offline fallback.
+    if (signal?.aborted) {
+      throw error;
+    }
+
+    // Try cached data when the network or response fails.
+    const cachedPokemon = await getCachedPokemonList(db);
+
+    if (cachedPokemon !== null) {
+      return cachedPokemon;
+    }
+
+    throw error;
+  }
 }

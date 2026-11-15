@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useSQLiteContext } from "expo-sqlite";
 
 import { getPokemonList } from "@/features/pokemon/repositories/listRepository";
 
@@ -8,10 +9,16 @@ import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 /**
  * usePokemonList - Manages Pokémon list state.
  *
- * Handles loading, errors, request cancellation,
- * and manual retries.
+ * Handles:
+ * 1. Fetching Pokémon through the repository.
+ * 2. Loading and error states.
+ * 3. Request cancellation.
+ * 4. Manual retries.
  */
 export function usePokemonList() {
+
+  // Access the database provided by SQLiteProvider.
+  const db = useSQLiteContext();
 
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +36,10 @@ export function usePokemonList() {
 
       try {
 
-        const data = await getPokemonList(controller.signal);
+        const data = await getPokemonList(
+          db,
+          controller.signal
+        );
 
         if (!controller.signal.aborted) {
           setPokemon(data);
@@ -53,13 +63,13 @@ export function usePokemonList() {
 
     void loadPokemon();
 
-    // Cancel the request when the effect is cleaned up.
+    // Cancel requests when the component unmounts.
     return () => controller.abort();
 
-  }, [retryCount]);
+  }, [db, retryCount]);
 
   /**
-   * Triggers another request for the Pokémon list.
+   * Triggers another Pokémon list request.
    */
   function refetch() {
     setRetryCount((current) => current + 1);
