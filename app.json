@@ -27,7 +27,21 @@
       "favicon": "./src/assets/favicon.png"
     },
     "plugins": [
-      "expo-splash-screen"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/splash-icon.png",
+          "backgroundColor": "#0064FF",
+          "resizeMode": "contain",
+          "imageWidth": 160,
+          "android": {
+            "image": "./src/assets/splash-icon.png",
+            "backgroundColor": "#0064FF",
+            "resizeMode": "contain",
+            "imageWidth": 150
+          }
+        }
+      ]
     ]
   }
 }
