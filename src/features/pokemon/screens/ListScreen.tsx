@@ -65,13 +65,12 @@ const ListScreen = ({ navigation }: ScreenProps) => {
     if (error) {
         return (
             <View style={styles.center}>
-                <Text>{error}</Text>
+                <Text style={styles.errorText}>{error}</Text>
 
                 <Pressable
                     style={styles.retryButton}
                     onPress={refetch}
-                    accessibilityRole="button"
-                >
+                    accessibilityRole="button">
                     <Text style={styles.retryText}>
                         Try again
                     </Text>
@@ -128,6 +127,11 @@ const styles = StyleSheet.create({
         padding: 16,
         gap: 12,
         flexGrow: 1,
+    },
+    errorText: {
+        color: "#B42318",
+        textAlign: "center",
+        fontWeight:500
     },
     retryButton: {
         backgroundColor: "#222222",

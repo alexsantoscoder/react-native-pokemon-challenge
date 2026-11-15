@@ -51,7 +51,7 @@ export function usePokemonDetail(pokemonId: number) {
 
         if (!controller.signal.aborted) {
           setError(
-            "Unable to load Pokémon details. Please try again."
+            "Unable to load Pokémon details. Verify you have internet connection and try again."
           );
         }
 

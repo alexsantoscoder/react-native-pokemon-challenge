@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Pokemon",
-    "slug": "pokemon",
+    "slug": "react-native-pokemon-challenge",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",

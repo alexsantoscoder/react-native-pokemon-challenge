@@ -49,7 +49,7 @@ export function usePokemonList() {
 
         if (!controller.signal.aborted) {
           setError(
-            "Unable to load Pokémon. Please try again."
+            "Unable to load Pokémon. Verify you have internet connection and try again."
           );
         }
 
