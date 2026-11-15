@@ -37,8 +37,7 @@ export async function getPokemonList(
       return {
         id,
         name: item.name,
-        image:
-          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+        image:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
       };
     });
 
