@@ -15,39 +15,18 @@ const MainNavigator = () => {
 
     return (
         <Tab.Navigator
+            tabBar={()=>null}
             screenOptions={{
-                headerShown: false,
-                tabBarActiveTintColor: COLORS.primary,
-                tabBarInactiveTintColor: COLORS.textSecondary,
-                tabBarStyle: styles.tabBar,
+                headerShown: false
             }}>
 
             <Tab.Screen
                 name={ROUTES.TABS.POKEMON_FLOW}
-                component={PokemonNavigator}
-                options={{
-                    title: "Pokedex",
-                    tabBarIcon: ({ color, focused, size }) => (
-                        <Ionicons
-                            name={focused ? "book" : "book-outline"}
-                            color={color}
-                            size={size}
-                            accessible={false}
-                        />
-                    ),
-                }}
-            />
+                component={PokemonNavigator}/>
 
         </Tab.Navigator>
     );
 }
  
-const styles = StyleSheet.create({
-    tabBar: {
-        backgroundColor: COLORS.backgroundSecondary,
-        borderTopColor: COLORS.border,
-        elevation: 0,
-    },
-});
 
 export default MainNavigator;

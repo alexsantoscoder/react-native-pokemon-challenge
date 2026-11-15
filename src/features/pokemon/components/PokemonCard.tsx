@@ -38,65 +38,81 @@ const PokemonCard = ({
       accessibilityRole="button"
       accessibilityLabel={`View ${pokemon.name} details`}
     >
-      <Image
-        source={{ uri: pokemon.image }}
-        style={styles.image}
-        resizeMode="contain"
-        accessibilityLabel={pokemon.name}
-      />
+      <View style={styles.artwork}>
+        <Image
+          source={{ uri: pokemon.image }}
+          style={styles.image}
+          resizeMode="contain"
+          accessibilityLabel={pokemon.name}
+        />
+      </View>
 
       <View style={styles.identity}>
-        <Text style={styles.name}>
-          {pokemon.name}
-        </Text>
-
         <Text style={styles.number}>
           #{String(pokemon.id).padStart(3, "0")}
         </Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name}>{pokemon.name}</Text>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={COLORS.primarySoft}
+            accessible={false}
+          />
+        </View>
       </View>
-
-      <Ionicons
-        name="chevron-forward"
-        size={20}
-        color={COLORS.textSecondary}
-        accessible={false}
-      />
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "center",
+    width: "100%",
+    maxWidth: 420,
+    maxHeight: "100%",
     backgroundColor: COLORS.card,
     borderColor: COLORS.border,
     borderWidth: 1,
-    borderRadius: 18,
-    padding: 12,
-    gap: 14,
+    borderRadius: 28,
+    padding: 20,
+    gap: 16,
   },
   cardPressed: {
     backgroundColor: COLORS.surface,
   },
+  artwork: {
+    width: "100%",
+    aspectRatio: 1,
+    flexShrink: 1,
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: 22,
+    padding: 12,
+  },
   image: {
-    width: 84,
-    height: 84,
+    flex: 1,
+    width: "100%",
   },
   identity: {
-    flex: 1,
+    gap: 4,
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
   },
   name: {
+    flexShrink: 1,
     color: COLORS.text,
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 34,
+    fontWeight: "800",
     textTransform: "capitalize",
   },
   number: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.primarySoft,
     fontVariant: ["tabular-nums"],
-    marginTop: 4,
+    fontWeight: "600",
   },
 });
 

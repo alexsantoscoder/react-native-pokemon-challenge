@@ -13,6 +13,7 @@
 
 // React
 import type { ComponentProps } from "react";
+import { FlatList } from "react-native";
 
 // React Native Testing Library
 import {
@@ -90,6 +91,25 @@ const defaultHookState: ReturnType<typeof usePokemonList> = {
   refetch: mockRefetch,
 };
 
+const PAGE_WIDTH = 360;
+const PAGE_HEIGHT = 520;
+
+function measureCarousel(width = PAGE_WIDTH) {
+  return fireEvent(screen.getByTestId("pokemon-carousel-viewport"), "layout", {
+    nativeEvent: { layout: { x: 0, y: 0, width, height: PAGE_HEIGHT } },
+  });
+}
+
+function scrollToPage(index: number, width = PAGE_WIDTH) {
+  return fireEvent.scroll(screen.getByTestId("pokemon-carousel"), {
+    nativeEvent: {
+      contentOffset: { x: index * width, y: 0 },
+      layoutMeasurement: { width, height: PAGE_HEIGHT },
+      contentSize: { width: mockPokemon.length * width, height: PAGE_HEIGHT },
+    },
+  });
+}
+
 describe("ListScreen", () => {
 
   beforeEach(() => {
@@ -98,6 +118,10 @@ describe("ListScreen", () => {
     mockUsePokemonList.mockReturnValue({
       ...defaultHookState,
     });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   /**
@@ -129,6 +153,7 @@ describe("ListScreen", () => {
     await render(
       <ListScreen navigation={navigation} route={route} />
     );
+    await measureCarousel();
 
     expect(
       screen.getByText("bulbasaur")
@@ -192,6 +217,7 @@ describe("ListScreen", () => {
     await render(
       <ListScreen navigation={navigation} route={route} />
     );
+    await measureCarousel();
 
     await fireEvent.press(
       screen.getByRole("button", {
@@ -204,6 +230,55 @@ describe("ListScreen", () => {
       { pokemonId: 1 }
     );
 
+  });
+
+  it("shows the padded counter and updates the page on forward and backward scrolling", async () => {
+    await render(<ListScreen navigation={navigation} route={route} />);
+    await measureCarousel();
+
+    expect(screen.getByText("01 / 02")).toBeTruthy();
+    expect(screen.getByLabelText("Pokémon 1 of 2")).toBeTruthy();
+
+    await scrollToPage(1);
+    expect(screen.getByText("02 / 02")).toBeTruthy();
+
+    await scrollToPage(0);
+    expect(screen.getByText("01 / 02")).toBeTruthy();
+  });
+
+  it("scrolls to adjacent pages from the arrows and disables each boundary", async () => {
+    const scrollToIndex = jest.spyOn(FlatList.prototype, "scrollToIndex");
+    await render(<ListScreen navigation={navigation} route={route} />);
+    await measureCarousel();
+
+    const previous = () => screen.getByRole("button", { name: "Previous Pokémon" });
+    const next = () => screen.getByRole("button", { name: "Next Pokémon" });
+
+    expect(previous()).toBeDisabled();
+    expect(next()).toBeEnabled();
+    await fireEvent.press(previous());
+    expect(scrollToIndex).not.toHaveBeenCalled();
+    await fireEvent.press(next());
+    expect(scrollToIndex).toHaveBeenLastCalledWith({ index: 1, animated: true });
+
+    await scrollToPage(1);
+    expect(next()).toBeDisabled();
+    expect(previous()).toBeEnabled();
+    await fireEvent.press(next());
+    expect(scrollToIndex).toHaveBeenCalledTimes(1);
+    await fireEvent.press(previous());
+    expect(scrollToIndex).toHaveBeenLastCalledWith({ index: 0, animated: true });
+  });
+
+  it("keeps the selected page after remeasurement and opens its detail", async () => {
+    await render(<ListScreen navigation={navigation} route={route} />);
+    await measureCarousel();
+    await scrollToPage(1);
+    await measureCarousel(400);
+
+    expect(screen.getByLabelText("Pokémon 2 of 2")).toBeTruthy();
+    await fireEvent.press(screen.getByRole("button", { name: "View ivysaur details" }));
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.POKEMON.DETAIL, { pokemonId: 2 });
   });
 
   /**
