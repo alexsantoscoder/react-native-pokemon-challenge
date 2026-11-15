@@ -1,149 +1,192 @@
-# Pokédex — React Native Technical Challenge
+# Pokémon Challenge
 
-A mobile Pokédex built with **React Native, Expo SDK 58, and TypeScript** as part of a technical assessment. The goal is to deliver a clear, maintainable application that retrieves Pokémon data from the public [PokéAPI](https://pokeapi.co/) and demonstrates thoughtful software design.
+A React Native Pokémon application built with **Expo SDK 58** and **TypeScript**. It retrieves the first 20 Pokémon from [PokéAPI](https://pokeapi.co/), lets users explore individual Pokémon details, and supports partial offline use through SQLite caching.
 
-> **Project status:** Initial project setup. Features and architecture described as *planned* below have not yet been implemented.
+## Features
 
-## Requirements and planned features
-
-- [ ] Display the **first 20 Pokémon** with a name and image.
-- [ ] Select a Pokémon to open its details.
-- [ ] Display useful details such as types, abilities, stats, height, weight, and base experience.
-- [ ] Provide loading, error, and empty states.
-- [ ] Handle network failures and make data available offline when previously cached.
-- [ ] Persist relevant Pokémon data locally and document the consistency strategy.
-- [ ] Support Android and iOS with a responsive, accessible interface.
-
-**Optional enhancements (not yet implemented):** pagination, skeleton loading, focused automated tests, additional accessibility improvements, and performance optimization.
+- Browse the first **20 Pokémon**, including their names and artwork.
+- Select a Pokémon to view its types, abilities, base stats, height, weight, and base experience.
+- Loading, error, retry, and empty states on list and detail screens.
+- Network-first data retrieval with **SQLite fallback** when a request fails.
+- Request cancellation using `AbortController` to avoid processing outdated requests.
+- Typed navigation and domain models using TypeScript.
+- Android and iOS support.
+- Automated tests for APIs, repositories, hooks, screens, and the Pokémon card.
 
 ## Tech stack
 
 | Technology | Purpose |
 | --- | --- |
-| React Native | Native Android and iOS UI |
-| Expo SDK 58 | Development tooling and native builds |
-| TypeScript (strict mode) | Static typing and maintainability |
-| PokéAPI | Public Pokémon data source |
-| Built-in `fetch` | HTTP requests without an additional networking dependency |
+| React Native + Expo SDK 58 | Cross-platform application and native tooling |
+| TypeScript | Strong typing and maintainable interfaces |
+| React Navigation | Typed stack and tab navigation |
+| Expo SQLite | Persistent local cache and schema migrations |
+| Native `fetch` | HTTP requests to PokéAPI without an additional networking library |
+| Jest + `jest-expo` | Automated test runner and Expo-compatible preset |
+| React Native Testing Library | Component and custom-hook tests |
 
-The assessment contains **conflicting guidance** about dependencies: section 7 disallows external libraries, while section 8 says library selection is permitted if justified. Until clarified, the implementation will minimize additional packages. Expo itself is expressly permitted. Navigation and on-device persistence choices will be documented once decided and implemented.
+Expo-native utilities, including the splash screen and status bar, are used for application-level presentation.
 
-## Getting started
+## Requirements
 
-### Prerequisites
-
-- Node.js **24.x** (Node 24.22.3 was used during project setup)
+- Node.js **24** (used for development)
 - npm
-- Android Studio and an Android emulator **or** Xcode and an iOS Simulator (macOS)
-- An environment that supports Expo SDK 58
+- Xcode and the iOS Simulator for iOS development on macOS
+- Android Studio and an Android emulator for Android development
 
-### Install
+Native builds require the relevant platform tools. A physical iPhone additionally requires Apple code signing.
+
+## Installation
+
+Clone the repository and install dependencies:
 
 ```bash
-npm ci
+git clone <YOUR_PUBLIC_REPOSITORY_URL>
+cd react-native-pokemon-challenge
+npm install
 ```
 
-### Run
+Start the Expo development server:
 
 ```bash
-# Start the Expo development server
 npx expo start
-
-# Build and launch Android locally
-npx expo run:android
-
-# Build and launch iOS locally (macOS only)
-npx expo run:ios
 ```
 
-`expo run:android` and `expo run:ios` automatically generate native projects on first use when the relevant native directory does not exist. Local native builds require their respective platform toolchains.
-
-### Validate
+Run the native application:
 
 ```bash
-npx expo-doctor
-npx expo install --check
-npx tsc --noEmit
+# iOS Simulator (macOS + Xcode)
+npx expo run:ios
+
+# Android emulator
+npx expo run:android
 ```
 
-## Architecture (planned)
+To test an **offline cold start** in the iOS Simulator without relying on Metro, build a release configuration while online:
 
-The intended approach is **Clean Architecture**, with clear separation between UI, application rules, and data access. The exact folder structure may evolve during implementation.
+```bash
+npx expo run:ios --configuration Release
+```
+
+## Project structure
 
 ```text
 src/
-  domain/
-    models/             # Core Pokémon entities and types
-    repositories/       # Repository interfaces
-    use-cases/          # Application operations
-  data/
-    api/                # PokéAPI HTTP access
-    mappers/            # API response → domain model
-    repositories/       # Repository implementations
-    storage/            # Local persistence implementation
-  presentation/
-    components/         # Reusable UI components
-    screens/            # Pokémon list and detail screens
-    hooks/              # Screen-facing state and logic
-  shared/
-    types/              # Cross-cutting shared types (if needed)
+├── config/
+│   └── api.ts
+├── db/
+│   ├── database.ts
+│   └── migrations.ts
+├── features/
+│   └── pokemon/
+│       ├── apis/
+│       │   ├── listApi.ts
+│       │   └── detailApi.ts
+│       ├── components/
+│       │   └── PokemonCard.tsx
+│       ├── hooks/
+│       │   ├── usePokemonList.ts
+│       │   └── usePokemonDetail.ts
+│       ├── models/
+│       │   ├── Pokemon.ts
+│       │   └── PokemonDetail.ts
+│       ├── repositories/
+│       │   ├── listRepository.ts
+│       │   └── detailRepository.ts
+│       ├── screens/
+│       │   ├── ListScreen.tsx
+│       │   └── DetailScreen.tsx
+│       └── storage/
+│           └── pokemonStorage.ts
+└── navigation/
+    ├── MainNavigator.tsx
+    ├── PokemonNavigator.tsx
+    ├── routes.ts
+    └── types.ts
 ```
 
-**Design goals:** keep business logic independent of React Native UI, depend on repository interfaces rather than concrete network clients, isolate side effects, and make critical logic testable. Dependency injection will be lightweight and explicit where useful; avoid unnecessary abstractions.
+Test files (`*.test.ts` and `*.test.tsx`) are colocated with the code they verify.
 
-## Data source
+## Architecture and design decisions
 
-[PokéAPI](https://pokeapi.co/)
-
-Potential API routes:
+The project adopts a **pragmatic, feature-based layered architecture** inspired by Clean Architecture principles. Responsibilities are separated without adding unnecessary classes, use-case passthroughs, or a dependency-injection container for this small assessment.
 
 ```text
-GET https://pokeapi.co/api/v2/pokemon?limit=20&offset=0
-GET https://pokeapi.co/api/v2/pokemon/{id-or-name}
+Screen / Component
+       ↓
+Custom Hook (UI state, lifecycle, retries, cancellation)
+       ↓
+Repository (data transformation, network-first policy, cache fallback)
+       ├── API module (native fetch / PokéAPI)
+       └── Storage module (Expo SQLite)
 ```
 
-API response types will be kept separate from domain models, with mappings implemented where useful.
+- **Screens** render user-facing states and manage navigation.
+- **Hooks** manage loading, errors, retries, and request cancellation.
+- **Repositories** map API responses into application models and coordinate network/cache access.
+- **API modules** handle HTTP requests and response status checks.
+- **Storage functions** encapsulate SQLite reads and writes.
+- **Models** represent the application's Pokémon data independently of the API response format.
 
-## Persistence and offline behavior (planned)
+This design prioritizes **single responsibility, separation of concerns, and testability**. It is not a strict implementation of the Dependency Inversion Principle: repositories currently import concrete API and SQLite storage functions directly. For the challenge's limited scope, this is a deliberate trade-off in favor of clarity and minimal orchestration.
 
-The project requires local persistence for relevant Pokémon information and a justification for the chosen strategy. The implementation will document:
+## Persistence and offline behavior
 
-- What data is cached, where it is stored, and why.
-- When cached entries are read or refreshed.
-- What happens when the device is offline or the API is unavailable.
+The application uses SQLite with versioned database migrations and a **network-first** strategy:
 
-No persistence solution is claimed as implemented yet. Any selected API/package must be checked against the assessment's library restriction.
+1. Request fresh Pokémon data from PokéAPI.
+2. Transform successful responses into typed application models.
+3. Save the list or selected Pokémon details to SQLite.
+4. If a request fails, attempt to return previously cached data.
+5. If neither the API nor SQLite can provide the requested Pokémon, display the appropriate error state.
 
-## Testing
+The cache stores the first Pokémon list and the details of Pokémon already opened. **Offline support is partial:** an uncached detail page cannot load while disconnected. Image URLs are stored, **not the image bytes**, so artwork may not be available offline. Caching a fresh response is best-effort; cache-write failures do not prevent fresh data from being shown.
 
-Automated tests are an **optional bonus** in the assessment and are **not configured yet**. If implemented, this section will document the test stack and exact commands.
+## Automated testing
 
-## Security and dependency notes
-
-During initial installation, `npm audit` reported **three moderate findings** along the Expo tooling dependency chain (`expo` → `@expo/fingerprint` → `minimatch`), including advisory [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249).
-
-At the time of the report, `npm audit fix --force` proposed a **breaking downgrade to Expo SDK 52**. That change was **not applied**. This is a tracked dependency warning, not a claim that the application is free from security risk. Before submitting, recheck the audit and available compatible updates:
+Run all tests:
 
 ```bash
-npm audit
-npm ls minimatch @expo/fingerprint
+npm test -- --runInBand
 ```
 
-## Known limitations and trade-offs
+Check TypeScript:
 
-- Functional screens, persistence, and testing are still pending implementation.
-- The restriction on third-party libraries requires clarification before selecting navigation and persistence dependencies.
-- The above moderate npm audit findings remain to be reviewed against compatible upstream fixes.
+```bash
+npx tsc --noEmit
+```
 
-## Deliverables checklist
+### Verified results
 
-- [ ] Pokémon list and details working on Android and iOS
-- [ ] Local persistence and network error handling documented
-- [ ] Architecture and dependency choices updated to reflect the implementation
-- [ ] Setup and validation instructions verified
-- [ ] Relevant screenshots or a short demo video added (recommended)
-- [ ] Known limitations and future improvements updated
+| Test suite | Tests passed |
+| --- | ---: |
+| `listApi.test.ts` | 5 |
+| `detailApi.test.ts` | 6 |
+| `listRepository.test.ts` | 4 |
+| `detailRepository.test.ts` | 5 |
+| `usePokemonList.test.ts` | 5 |
+| `usePokemonDetail.test.ts` | 6 |
+| `PokemonCard.test.tsx` | 4 |
+| `ListScreen.test.tsx` | 6 |
+| `DetailScreen.test.tsx` | 5 |
+| **Total** | **46** |
 
----
+**Last reported verification:** 9 test suites passed, 46 tests passed, 0 test failures; `npx tsc --noEmit` completed with no errors (November 15, 2026).
 
-*Technical assessment project. Pokémon and related names belong to their respective owners. Pokémon data is provided by the community-driven PokéAPI.*
+The automated tests use mocks to isolate network, storage, hooks, and screen behavior. They do not constitute end-to-end tests against live PokéAPI or physical-device tests.
+
+## Manual verification
+
+- Pokémon listing and detail navigation tested on Android and iOS Simulator.
+- SQLite persistence and offline fallback verified in the iOS Simulator.
+- Physical iPhone testing was not completed because the local macOS environment lacked an available iOS signing identity; it is not a known application defect.
+
+## Dependencies and assessment considerations
+
+The technical assessment contains two conflicting dependency statements: Section 7 disallows external libraries, while Section 8 permits library selection when justified. This implementation uses React Navigation for navigation, Expo SQLite for persistent offline storage, and Jest/React Native Testing Library for testing; each addresses an explicit functional or quality requirement. Network requests use the native `fetch` API rather than a third-party HTTP client.
+
+## Limitations and potential improvements
+
+- The initial listing is limited to the first 20 Pokémon; pagination is a potential enhancement.
+- Pokémon images are referenced by remote URLs and may not display without connectivity.
+- Only previously opened Pokémon detail records are accessible offline.
