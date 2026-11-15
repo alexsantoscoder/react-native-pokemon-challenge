@@ -28,25 +28,19 @@ interface PokemonCarouselProps {
 
 const PokemonCarousel = ({ pokemon, onPokemonPress }: PokemonCarouselProps) => {
   const list = useRef<FlatList<Pokemon>>(null);
-  const [viewport, setViewport] = useState({ width: 0, height: 0, initialIndex: 0 });
+  const [viewport, setViewport] = useState({ width: 0, initialIndex: 0 });
   const [activeIndex, setActiveIndex] = useState(0);
-  const { width, height, initialIndex } = viewport;
+  const { width, initialIndex } = viewport;
   const lastIndex = pokemon.length - 1;
   const currentIndex = Math.min(activeIndex, lastIndex);
   const dotCount = Math.min(pokemon.length, 4);
   const activeDot = Math.floor(currentIndex * dotCount / pokemon.length);
 
   const measureViewport = ({ nativeEvent }: LayoutChangeEvent) => {
-    const { width, height } = nativeEvent.layout;
-    setViewport((previous) => {
-      if (previous.width === width && previous.height === height) return previous;
-
-      return {
-        width,
-        height,
-        initialIndex: previous.width === width ? previous.initialIndex : currentIndex,
-      };
-    });
+    const { width } = nativeEvent.layout;
+    setViewport((previous) =>
+      previous.width === width ? previous : { width, initialIndex: currentIndex }
+    );
   };
 
   const updatePage = ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -64,7 +58,7 @@ const PokemonCarousel = ({ pokemon, onPokemonPress }: PokemonCarouselProps) => {
   const renderArrow = (direction: "previous" | "next") => {
     const isPrevious = direction === "previous";
     const target = currentIndex + (isPrevious ? -1 : 1);
-    const disabled = width <= 0 || height <= 0 || target < 0 || target > lastIndex;
+    const disabled = width <= 0 || target < 0 || target > lastIndex;
 
     return (
       <Pressable
@@ -96,17 +90,18 @@ const PokemonCarousel = ({ pokemon, onPokemonPress }: PokemonCarouselProps) => {
         onLayout={measureViewport}
         testID="pokemon-carousel-viewport"
       >
-        {width > 0 && height > 0 && (
+        {width > 0 && (
           <FlatList
             key={width}
             ref={list}
+            style={styles.list}
             data={pokemon}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View style={[styles.page, { width, height }]}>
+              <View style={[styles.page, { width }]}>
                 <PokemonCard pokemon={item} onPress={onPokemonPress} />
               </View>
             )}
@@ -147,14 +142,17 @@ const PokemonCarousel = ({ pokemon, onPokemonPress }: PokemonCarouselProps) => {
 
 const ListScreen = ({ navigation }: ScreenProps) => {
   const { pokemon, isLoading, error, refetch } = usePokemonList();
-  const { top, left, right } = useSafeAreaInsets();
+  const { top, bottom, left, right } = useSafeAreaInsets();
 
   const gotoDetail = useCallback((pokemonId: number) => {
     navigation.navigate(ROUTES.POKEMON.DETAIL, { pokemonId });
   }, [navigation]);
 
   return (
-    <View style={[styles.container, { paddingTop: top, paddingLeft: left, paddingRight: right }]}>
+    <View style={[
+      styles.container,
+      { paddingTop: top, paddingBottom: bottom, paddingLeft: left, paddingRight: right },
+    ]}>
       <View style={styles.header}>
         <Text accessibilityRole="header" style={styles.title}>Pokedex</Text>
       </View>
@@ -192,23 +190,26 @@ const styles = StyleSheet.create({
   },
   carousel: {
     flex: 1,
+    justifyContent: "center",
+    gap: 12,
+    paddingVertical: 8,
   },
   viewport: {
-    flex: 1,
+    flexShrink: 1,
+  },
+  list: {
+    flexGrow: 0,
   },
   page: {
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 16,
-    paddingVertical: 8,
   },
   pagination: {
     alignSelf: "center",
     width: "100%",
     maxWidth: CONTENT_MAX_WIDTH,
     paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 16,
     gap: 10,
   },
   controls: {
