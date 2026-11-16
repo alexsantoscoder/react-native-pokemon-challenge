@@ -72,36 +72,64 @@ npx expo run:ios --configuration Release
 
 ```text
 src/
+├── assets/
 ├── config/
-│   └── api.ts
+│   ├── api.ts
+│   └── theme.ts
 ├── db/
 │   ├── database.ts
 │   └── migrations.ts
 ├── features/
-│   └── pokemon/
-│       ├── apis/
-│       │   ├── listApi.ts
-│       │   └── detailApi.ts
+│   ├── pokemon/
+│   │   ├── apis/
+│   │   │   ├── detailApi.ts
+│   │   │   └── listApi.ts
+│   │   ├── components/
+│   │   │   ├── detail/
+│   │   │   │   ├── PokemonDetailAbilities.tsx
+│   │   │   │   ├── PokemonDetailAttributes.tsx
+│   │   │   │   ├── PokemonDetailHero.tsx
+│   │   │   │   ├── PokemonDetailScreen.tsx
+│   │   │   │   ├── PokemonDetailSection.tsx
+│   │   │   │   └── PokemonDetailStats.tsx
+│   │   │   ├── list/
+│   │   │   │   ├── pagination/
+│   │   │   │   │   ├── PokemonCarouselControls.tsx
+│   │   │   │   │   └── PokemonCarouselProgressDots.tsx
+│   │   │   │   ├── PokemonCard.tsx
+│   │   │   │   ├── PokemonCarousel.tsx
+│   │   │   │   ├── PokemonCarouselPagination.tsx
+│   │   │   │   ├── PokemonListHeader.tsx
+│   │   │   │   └── PokemonListScreen.tsx
+│   │   │   └── PokemonScreenState.tsx
+│   │   ├── hooks/
+│   │   │   ├── usePokemonDetail.ts
+│   │   │   └── usePokemonList.ts
+│   │   ├── models/
+│   │   │   ├── Pokemon.ts
+│   │   │   └── PokemonDetail.ts
+│   │   ├── repositories/
+│   │   │   ├── detailRepository.ts
+│   │   │   └── listRepository.ts
+│   │   ├── screens/
+│   │   │   ├── DetailScreen.tsx
+│   │   │   └── ListScreen.tsx
+│   │   └── storage/
+│   │       └── pokemonStorage.ts
+│   └── trainers/
 │       ├── components/
-│       │   └── PokemonCard.tsx
-│       ├── hooks/
-│       │   ├── usePokemonList.ts
-│       │   └── usePokemonDetail.ts
+│       │   └── TrainerCard.tsx
 │       ├── models/
-│       │   ├── Pokemon.ts
-│       │   └── PokemonDetail.ts
-│       ├── repositories/
-│       │   ├── listRepository.ts
-│       │   └── detailRepository.ts
-│       ├── screens/
-│       │   ├── ListScreen.tsx
-│       │   └── DetailScreen.tsx
-│       └── storage/
-│           └── pokemonStorage.ts
+│       │   └── Trainer.ts
+│       └── screens/
+│           ├── DetailScreen.tsx
+│           └── ListScreen.tsx
 └── navigation/
     ├── MainNavigator.tsx
     ├── PokemonNavigator.tsx
+    ├── navigationTheme.ts
     ├── routes.ts
+    ├── screenOptions.ts
     └── types.ts
 ```
 
