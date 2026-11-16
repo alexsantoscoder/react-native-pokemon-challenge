@@ -17,6 +17,7 @@ import { FlatList } from "react-native";
 
 // React Native Testing Library
 import {
+  act,
   render,
   screen,
   fireEvent,
@@ -268,6 +269,25 @@ describe("ListScreen", () => {
     expect(scrollToIndex).toHaveBeenCalledTimes(1);
     await fireEvent.press(previous());
     expect(scrollToIndex).toHaveBeenLastCalledWith({ index: 0, animated: true });
+  });
+
+  it.each([
+    { arrow: "Previous Pokémon", startPage: 1, boundary: 0 },
+    { arrow: "Next Pokémon", startPage: 0, boundary: 1 },
+  ])("ignores a $arrow press released at its boundary", async ({ arrow, startPage, boundary }) => {
+    const scrollToIndex = jest.spyOn(FlatList.prototype, "scrollToIndex");
+    await render(<ListScreen navigation={navigation} route={route} />);
+    await measureCarousel();
+    await scrollToPage(startPage);
+
+    const button = () => screen.getByRole("button", { name: arrow });
+    const event = { currentTarget: 1, nativeEvent: { pageX: 0, pageY: 0 }, persist: jest.fn() };
+    await act(() => button().props.onResponderGrant(event));
+    await scrollToPage(boundary);
+    expect(button()).toBeDisabled();
+    await act(() => button().props.onResponderRelease(event));
+
+    expect(scrollToIndex).not.toHaveBeenCalled();
   });
 
   it("keeps the selected page after remeasurement and opens its detail", async () => {

@@ -27,7 +27,7 @@ export default function PokemonScreenState(props: PokemonScreenStateProps) {
         <Ionicons
           name={props.kind === "error" ? "alert-circle-outline" : "information-circle-outline"}
           color={props.kind === "error" ? COLORS.error : COLORS.textSecondary}
-          size={24}
+          size={100}
           accessible={false}
         />
       )}

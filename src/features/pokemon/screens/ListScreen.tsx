@@ -67,7 +67,12 @@ const PokemonCarousel = ({ pokemon, onPokemonPress }: PokemonCarouselProps) => {
           disabled && styles.arrowDisabled,
           pressed && styles.arrowPressed,
         ]}
-        onPress={() => list.current?.scrollToIndex({ index: target, animated: true })}
+        onPress={() => {
+          // Scrolling can disable this arrow while a press is still in progress.
+          if (disabled) return;
+
+          list.current?.scrollToIndex({ index: target, animated: true });
+        }}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={isPrevious ? "Previous Pokémon" : "Next Pokémon"}
