@@ -41,7 +41,7 @@ Native builds require the relevant platform tools. A physical iPhone additionall
 Clone the repository and install dependencies:
 
 ```bash
-git clone <YOUR_PUBLIC_REPOSITORY_URL>
+git clone <https://github.com/alexsantoscoder/react-native-pokemon-challenge.git>
 cd react-native-pokemon-challenge
 npm install
 ```
