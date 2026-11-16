@@ -1,9 +1,19 @@
+/**
+ * Displays one Pokémon card per page and keeps the pagination controls in sync
+ * with swipes and arrow navigation.
+ */
+
+// React hooks
 import { useRef, useState } from "react";
+
+// Native list and layout
 import { FlatList, I18nManager, StyleSheet, View } from "react-native";
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
+// Pokémon model
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
+// Carousel content and controls
 import PokemonCard from "./PokemonCard";
 import PokemonCarouselPagination from "./PokemonCarouselPagination";
 
@@ -23,6 +33,7 @@ export default function PokemonCarousel({ pokemon, onPokemonPress }: PokemonCaro
 
   const measureViewport = ({ nativeEvent }: LayoutChangeEvent) => {
     const { width } = nativeEvent.layout;
+    // A width change remounts the list, so retain the current page as its starting index.
     setViewport((previous) =>
       previous.width === width ? previous : { width, initialIndex: currentIndex }
     );
@@ -32,6 +43,7 @@ export default function PokemonCarousel({ pokemon, onPokemonPress }: PokemonCaro
     if (!width) return;
 
     const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+    // Measure from the leading edge so page indices follow reading order.
     const offset = I18nManager.isRTL
       ? contentSize.width - layoutMeasurement.width - contentOffset.x
       : contentOffset.x;

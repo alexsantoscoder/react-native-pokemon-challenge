@@ -1,12 +1,17 @@
+/**
+ * Centralizes the route names shared by navigator registration, navigation
+ * calls, and route parameter types.
+ */
+
 export const ROUTES = {
 
-  //Pokemon Flow
+  // Pokémon stack routes
   POKEMON: {
     LIST: 'PokemonList',
     DETAIL: 'PokemonDetail',
   },
 
-  // Main Tab Navigator Keys
+  // Root tab routes
   TABS: {
     POKEMON_FLOW: 'PokemonFlow',
   }

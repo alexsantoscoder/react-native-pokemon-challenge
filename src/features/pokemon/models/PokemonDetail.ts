@@ -1,3 +1,7 @@
+/**
+ * Extends the shared Pokémon model with measurements, types, abilities,
+ * and base stats for the detail screen.
+ */
 
 import type { Pokemon } from "./Pokemon";
 
@@ -9,13 +13,12 @@ export interface PokemonStat {
   value: number;
 }
 
-/**
- * PokemonDetail - Domain model containing
- * the selected Pokémon's complete information.
- */
 export interface PokemonDetail extends Pokemon {
+  /** Height in meters. */
   height: number;
+  /** Weight in kilograms. */
   weight: number;
+  /** Defaults to zero when the response has no base experience value. */
   baseExperience: number;
   types: string[];
   abilities: string[];

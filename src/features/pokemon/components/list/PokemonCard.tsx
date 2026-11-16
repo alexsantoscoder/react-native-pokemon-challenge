@@ -1,4 +1,9 @@
+/**
+ * Shows a Pokémon's artwork, name, and Pokédex number in the carousel.
+ * Pressing the card reports the Pokémon ID to the parent.
+ */
 
+// Native UI and icons
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   View,
@@ -8,24 +13,22 @@ import {
   StyleSheet,
 } from "react-native";
 
+// React memoization
 import { memo } from "react";
+
+// App theme
 import { COLORS } from "@/config/theme";
+
+// Pokémon model
 import type {
   Pokemon,
 } from "@/features/pokemon/models/Pokemon";
 
-/**
- * PokemonCard component props.
- */
 interface PokemonCardProps {
   pokemon: Pokemon;
   onPress: (pokemonId: number) => void;
 }
 
-/**
- * PokemonCard - Displays a Pokémon's image,
- * name, and Pokédex number.
- */
 const PokemonCard = ({
   pokemon,
   onPress,

@@ -1,4 +1,12 @@
+/**
+ * Defines the shared stack header and screen appearance, along with an
+ * optional preset that hides the back button and disables back gestures.
+ */
+
+// React Navigation options
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+
+// App palette
 import { COLORS } from "@/config/theme";
 
 export const SCREEN_OPTIONS: NativeStackNavigationOptions = {

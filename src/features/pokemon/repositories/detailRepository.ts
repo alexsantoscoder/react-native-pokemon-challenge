@@ -1,19 +1,23 @@
+/**
+ * Fetches a Pokémon by ID and maps the PokéAPI response to the app's detail model.
+ * Saves the result in SQLite as a fallback for failed requests for the same ID.
+ */
 
+// SQLite database type
 import type { SQLiteDatabase } from "expo-sqlite";
 
+// PokéAPI detail request
 import { fetchPokemonDetail } from "@/features/pokemon/apis/detailApi";
 
+// SQLite cache
 import {
   savePokemonDetail,
   getCachedPokemonDetail,
 } from "@/features/pokemon/storage/pokemonStorage";
 
+// Pokémon detail model
 import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 
-/**
- * DetailRepository - Retrieves Pokémon details
- * using PokéAPI with SQLite offline fallback.
- */
 export async function getPokemonDetail(
   db: SQLiteDatabase,
   pokemonId: number,
@@ -22,7 +26,6 @@ export async function getPokemonDetail(
 
   try {
 
-    // Fetch fresh Pokémon details.
     const data = await fetchPokemonDetail(
       pokemonId,
       signal
@@ -59,12 +62,12 @@ export async function getPokemonDetail(
       })),
     };
 
-    // Avoid caching a cancelled request.
+    // Skip the cache write if the request was cancelled during the fetch.
     if (signal?.aborted) {
       throw new Error("Request cancelled");
     }
 
-    // Cache successful details.
+    // A cache write failure still allows the freshly fetched details to be returned.
     try {
       await savePokemonDetail(db, pokemon);
     } catch (cacheError) {
@@ -75,11 +78,11 @@ export async function getPokemonDetail(
 
   } catch (error) {
 
+    // Cancellation should not trigger an offline fallback.
     if (signal?.aborted) {
       throw error;
     }
 
-    // Read previously cached details.
     const cachedPokemon = await getCachedPokemonDetail(
       db,
       pokemonId

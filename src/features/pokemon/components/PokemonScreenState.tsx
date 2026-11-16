@@ -1,3 +1,9 @@
+/**
+ * Renders a shared loading, empty, or error view for Pokémon screens.
+ * The error view includes a retry action when a request fails.
+ */
+
+// Native UI and icons
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   ActivityIndicator,
@@ -7,6 +13,7 @@ import {
   Text,
 } from "react-native";
 
+// App theme
 import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
 
 type PokemonScreenStateProps = { message: string } & (

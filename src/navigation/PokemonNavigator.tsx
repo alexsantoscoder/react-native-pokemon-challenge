@@ -1,12 +1,19 @@
-// Navigation primitives and route definitions
-import { ROUTES } from "@/navigation/routes";
+/**
+ * Opens the Pokédex list first and provides a route to individual Pokémon
+ * details. The list supplies its own header, while details use the stack header.
+ */
+
+// React Navigation
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+// Application routes and types
+import { ROUTES } from "@/navigation/routes";
 import type { PokemonStackParamList } from "@/navigation/types";
 
-// Shared stack header and gesture configuration presets
+// Shared stack styling
 import { SCREEN_OPTIONS } from "@/navigation/screenOptions";
 
-// Screen Imports
+// Pokémon screens
 import ListScreen from "@/features/pokemon/screens/ListScreen";
 import DetailScreen from "@/features/pokemon/screens/DetailScreen";
 

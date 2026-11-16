@@ -1,6 +1,15 @@
+/**
+ * Introduces the selected Pokémon with its artwork, Pokédex number, name,
+ * and color-coded type badges.
+ */
+
+// Native UI
 import { Image, StyleSheet, Text, View } from "react-native";
 
+// App theme
 import { COLORS } from "@/config/theme";
+
+// Pokémon model
 import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 
 type PokemonDetailHeroProps = Pick<PokemonDetail, "id" | "name" | "image" | "types">;

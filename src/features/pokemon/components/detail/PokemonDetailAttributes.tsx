@@ -1,7 +1,16 @@
+/**
+ * Shows height, weight, and base experience in tiles that can wrap as the
+ * device's font scale increases.
+ */
+
+// Native UI and icons
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
+// App theme
 import { COLORS } from "@/config/theme";
+
+// Pokémon model
 import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 
 type PokemonDetailAttributesProps = Pick<PokemonDetail, "height" | "weight" | "baseExperience">;

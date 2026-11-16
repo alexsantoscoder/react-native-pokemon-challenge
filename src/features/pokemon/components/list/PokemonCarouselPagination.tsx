@@ -1,6 +1,13 @@
+/**
+ * Renders the carousel arrows, current page count, and progress dots.
+ * Arrows request an adjacent page once the carousel has been measured.
+ */
+
+// Native UI and icons
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { I18nManager, Pressable, StyleSheet, Text, View } from "react-native";
 
+// App theme
 import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
 
 interface PokemonCarouselPaginationProps {
@@ -17,6 +24,7 @@ export default function PokemonCarouselPagination({
   onPageSelect,
 }: PokemonCarouselPaginationProps) {
   const currentPage = currentIndex + 1;
+  // Group pages across at most four dots while the counter shows the exact page.
   const dotCount = Math.min(itemCount, 4);
   const activeDot = Math.floor(currentIndex * dotCount / itemCount);
 

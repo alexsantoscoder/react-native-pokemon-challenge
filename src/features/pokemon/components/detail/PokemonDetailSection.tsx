@@ -1,7 +1,18 @@
+/**
+ * Gives the abilities and base stats sections a shared layout with an
+ * accessible heading and a decorative icon.
+ */
+
+// Icons
 import Ionicons from "@expo/vector-icons/Ionicons";
+
+// React types
 import type { ComponentProps, ReactNode } from "react";
+
+// Native UI
 import { StyleSheet, Text, View } from "react-native";
 
+// App theme
 import { COLORS } from "@/config/theme";
 
 interface PokemonDetailSectionProps {

@@ -1,7 +1,14 @@
+/**
+ * Displays the Pokémon's abilities as badges with readable labels.
+ */
+
+// Native UI
 import { StyleSheet, Text, View } from "react-native";
 
+// App theme
 import { COLORS } from "@/config/theme";
 
+// Related components
 import PokemonDetailSection from "./PokemonDetailSection";
 
 interface PokemonDetailAbilitiesProps {

@@ -1,19 +1,23 @@
+/**
+ * Fetches the Pokémon list from PokéAPI and maps it to the app's list model.
+ * Saves successful results in SQLite for use when a later request fails.
+ */
 
+// SQLite database type
 import type { SQLiteDatabase } from "expo-sqlite";
 
+// PokéAPI list request
 import { fetchPokemonList } from "@/features/pokemon/apis/listApi";
 
+// SQLite cache
 import {
   savePokemonList,
   getCachedPokemonList,
 } from "@/features/pokemon/storage/pokemonStorage";
 
+// Pokémon list model
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
-/**
- * ListRepository - Retrieves Pokémon from PokéAPI
- * and provides a SQLite fallback when offline.
- */
 export async function getPokemonList(
   db: SQLiteDatabase,
   signal?: AbortSignal
@@ -21,11 +25,11 @@ export async function getPokemonList(
 
   try {
 
-    // Fetch fresh Pokémon data.
     const data = await fetchPokemonList(signal);
 
     const pokemon = data.results.map((item): Pokemon => {
 
+      // The list response provides the Pokémon ID in its URL.
       const match = item.url.match(/\/pokemon\/(\d+)\/?$/);
 
       if (!match) {
@@ -41,12 +45,12 @@ export async function getPokemonList(
       };
     });
 
-    // Do not cache data from a cancelled request.
+    // Skip the cache write if the request was cancelled during the fetch.
     if (signal?.aborted) {
       throw new Error("Request cancelled");
     }
 
-    // Cache successful responses without blocking display.
+    // A cache write failure still allows the freshly fetched list to be returned.
     try {
       await savePokemonList(db, pokemon);
     } catch (cacheError) {
@@ -62,7 +66,6 @@ export async function getPokemonList(
       throw error;
     }
 
-    // Try cached data when the network or response fails.
     const cachedPokemon = await getCachedPokemonList(db);
 
     if (cachedPokemon !== null) {

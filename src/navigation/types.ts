@@ -1,12 +1,6 @@
-
 /**
- * Navigation Types - TypeScript definitions for application navigation.
- *
- * Provides:
- * 1. Strongly typed routes and navigation parameters.
- * 2. Type-safe navigation between Pokémon screens.
- * 3. Support for nested stack and tab navigators.
- * 4. Reusable generic types for screen navigation props.
+ * Defines route parameters for the root tab and nested Pokémon stack.
+ * Screens use these types to get the route and navigation props for their route.
  */
 
 // React Navigation types
@@ -17,8 +11,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ROUTES } from '@/navigation/routes';
 
 /**
- * Defines the available Pokémon stack screens
- * and the parameters required by each route.
+ * The list opens without parameters. Details require the selected Pokémon ID.
  */
 export type PokemonStackParamList = {
   [ROUTES.POKEMON.LIST]: undefined;
@@ -28,22 +21,15 @@ export type PokemonStackParamList = {
 };
 
 /**
- * Defines the main tab navigator's routes,
- * including the nested Pokémon stack.
+ * Allows the root tab to target a screen inside the Pokémon stack.
  */
 export type MainTabParamList = {
   [ROUTES.TABS.POKEMON_FLOW]: NavigatorScreenParams<PokemonStackParamList>;
 };
 
 /**
- * Reusable generic type for Pokémon stack screen props.
- *
- * T represents a route name from PokemonStackParamList.
- * Automatically provides the correct navigation and route
- * types based on the selected screen.
- *
- * Example:
- * PokemonScreenProps<typeof ROUTES.POKEMON.DETAIL>
+ * Resolves the screen props for a Pokémon route, such as
+ * `PokemonScreenProps<typeof ROUTES.POKEMON.DETAIL>`.
  */
 export type PokemonScreenProps<
   T extends keyof PokemonStackParamList

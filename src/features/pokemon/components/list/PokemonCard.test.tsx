@@ -1,12 +1,6 @@
-
 /**
- * PokemonCard component tests.
- *
- * Verifies:
- * 1. Pokémon name rendering.
- * 2. Pokémon image source.
- * 3. Pokémon ID formatting.
- * 4. Press events with the correct Pokémon ID.
+ * Verifies that the card renders the Pokémon's name, artwork, and formatted
+ * number and passes the correct ID to its press callback.
  */
 
 // React Native Testing Library
@@ -19,7 +13,7 @@ import {
 // Component
 import PokemonCard from "./PokemonCard";
 
-// Models
+// Pokémon model
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 
 jest.mock("@expo/vector-icons/Ionicons", () => () => null);
@@ -34,7 +28,6 @@ const mockPokemon: Pokemon = {
 
 describe("PokemonCard", () => {
 
-  // 1. Pokémon name
   it("renders the Pokémon name correctly", async () => {
 
     await render(
@@ -50,7 +43,6 @@ describe("PokemonCard", () => {
 
   });
 
-  // 2. Pokémon image
   it("renders the correct Pokémon image", async () => {
 
     await render(
@@ -68,7 +60,6 @@ describe("PokemonCard", () => {
 
   });
 
-  // 3. Pokémon ID
   it("renders the Pokémon ID with three digits", async () => {
 
     await render(
@@ -84,7 +75,6 @@ describe("PokemonCard", () => {
 
   });
 
-  // 4. Card press
   it("calls onPress with the correct Pokémon ID", async () => {
 
     const mockOnPress = jest.fn();

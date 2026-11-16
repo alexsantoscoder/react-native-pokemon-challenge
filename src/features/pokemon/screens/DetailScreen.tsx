@@ -1,12 +1,21 @@
-import { ScrollView, StyleSheet } from "react-native";
+/**
+ * Shows the artwork, attributes, abilities, and base stats for the Pokémon
+ * selected by the route. Uses cached details as a fallback and lets users
+ * retry a failed load.
+ */
 
-import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
-import PokemonDetailAbilities from "@/features/pokemon/components/PokemonDetailAbilities";
-import PokemonDetailAttributes from "@/features/pokemon/components/PokemonDetailAttributes";
-import PokemonDetailHero from "@/features/pokemon/components/PokemonDetailHero";
-import PokemonDetailStats from "@/features/pokemon/components/PokemonDetailStats";
+// Pokémon layout and UI components
+import PokemonDetailAbilities from "@/features/pokemon/components/detail/PokemonDetailAbilities";
+import PokemonDetailAttributes from "@/features/pokemon/components/detail/PokemonDetailAttributes";
+import PokemonDetailHero from "@/features/pokemon/components/detail/PokemonDetailHero";
+import PokemonDetailScreen from "@/features/pokemon/components/detail/PokemonDetailScreen";
+import PokemonDetailStats from "@/features/pokemon/components/detail/PokemonDetailStats";
 import PokemonScreenState from "@/features/pokemon/components/PokemonScreenState";
+
+// Pokémon detail data
 import { usePokemonDetail } from "@/features/pokemon/hooks/usePokemonDetail";
+
+// Navigation
 import { ROUTES } from "@/navigation/routes";
 import type { PokemonScreenProps } from "@/navigation/types";
 
@@ -16,6 +25,7 @@ const DetailScreen = ({ route }: ScreenProps) => {
   
   const { pokemon, isLoading, error, refetch } = usePokemonDetail(route.params.pokemonId);
 
+  // Each request clears the details, so loading and errors take precedence over the empty state.
   if (isLoading) {
     return <PokemonScreenState kind="loading" message="Loading Pokémon details..." />;
   }
@@ -29,11 +39,7 @@ const DetailScreen = ({ route }: ScreenProps) => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      indicatorStyle="white"
-    >
+    <PokemonDetailScreen>
       <PokemonDetailHero
         id={pokemon.id}
         name={pokemon.name}
@@ -47,24 +53,8 @@ const DetailScreen = ({ route }: ScreenProps) => {
       />
       <PokemonDetailAbilities abilities={pokemon.abilities} />
       <PokemonDetailStats stats={pokemon.stats} />
-    </ScrollView>
+    </PokemonDetailScreen>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    alignSelf: "center",
-    width: "100%",
-    maxWidth: CONTENT_MAX_WIDTH,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 32,
-    gap: 24,
-  },
-});
 
 export default DetailScreen;

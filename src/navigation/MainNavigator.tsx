@@ -1,9 +1,16 @@
-// Navigation primitives and route definitions
-import { ROUTES } from "@/navigation/routes";
+/**
+ * Hosts the Pokémon flow in the root tab navigator. The root tab bar and
+ * header are hidden so the nested stack manages the visible navigation.
+ */
+
+// React Navigation
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+// Application routes and types
+import { ROUTES } from "@/navigation/routes";
 import type { MainTabParamList } from "@/navigation/types";
 
-// Feature navigators and flow entry screens
+// Feature navigator
 import PokemonNavigator from "@/navigation/PokemonNavigator";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();

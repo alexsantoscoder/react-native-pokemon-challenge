@@ -1,9 +1,19 @@
+/**
+ * Places the Pokédex heading above the list content and keeps both within
+ * the device's safe area.
+ */
+
+// React types
 import type { ReactNode } from "react";
+
+// Native layout and safe area
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+// App theme
 import { COLORS } from "@/config/theme";
 
+// Pokédex heading
 import PokemonListHeader from "./PokemonListHeader";
 
 interface PokemonListScreenProps {

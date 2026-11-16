@@ -1,5 +1,11 @@
+/**
+ * Supplies the Pokédex list screen's visible and accessible heading.
+ */
+
+// Native UI
 import { StyleSheet, Text, View } from "react-native";
 
+// App theme
 import { COLORS, CONTENT_MAX_WIDTH } from "@/config/theme";
 
 export default function PokemonListHeader() {

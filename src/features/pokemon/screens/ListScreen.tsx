@@ -1,9 +1,20 @@
+/**
+ * Displays the Pokédex carousel and opens the details for the selected Pokémon.
+ * Falls back to cached entries when fetching fails and lets users retry a failed load.
+ */
+
+// React
 import { useCallback } from "react";
 
-import PokemonCarousel from "@/features/pokemon/components/PokemonCarousel";
-import PokemonListScreen from "@/features/pokemon/components/PokemonListScreen";
+// Pokémon layout and UI components
+import PokemonCarousel from "@/features/pokemon/components/list/PokemonCarousel";
+import PokemonListScreen from "@/features/pokemon/components/list/PokemonListScreen";
 import PokemonScreenState from "@/features/pokemon/components/PokemonScreenState";
+
+// Pokémon list data
 import { usePokemonList } from "@/features/pokemon/hooks/usePokemonList";
+
+// Navigation
 import { ROUTES } from "@/navigation/routes";
 import type { PokemonScreenProps } from "@/navigation/types";
 
@@ -20,6 +31,7 @@ const ListScreen = ({ navigation }: ScreenProps) => {
 
   return (
     <PokemonListScreen>
+      {/* The list starts empty, so loading and errors take precedence. */}
       {isLoading ? (
         <PokemonScreenState kind="loading" message="Loading Pokémon..." />
       ) : error ? (

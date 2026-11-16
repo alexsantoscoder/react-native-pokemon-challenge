@@ -1,20 +1,20 @@
+/**
+ * Stores the Pokémon list and individual details as JSON in SQLite so they
+ * can be shown when a network request fails.
+ */
 
+// SQLite database type
 import type { SQLiteDatabase } from "expo-sqlite";
 
+// Pokémon models
 import type { Pokemon } from "@/features/pokemon/models/Pokemon";
 import type { PokemonDetail } from "@/features/pokemon/models/PokemonDetail";
 
+// The app fetches a single page containing the first 20 Pokémon.
 const LIST_CACHE_KEY = "first_20";
 
 /**
- * Pokemon Storage - Local SQLite operations.
- *
- * Stores and retrieves Pokémon list and detail data
- * for partial offline availability.
- */
-
-/**
- * Saves the Pokémon list to SQLite.
+ * Writes the list and its timestamp, replacing any existing entry.
  */
 export async function savePokemonList(
   db: SQLiteDatabase,
@@ -36,9 +36,7 @@ export async function savePokemonList(
 }
 
 /**
- * Retrieves the cached Pokémon list.
- *
- * Returns null when no cache exists.
+ * Returns the cached list, or null when there is no cache entry.
  */
 export async function getCachedPokemonList(
   db: SQLiteDatabase
@@ -61,7 +59,7 @@ export async function getCachedPokemonList(
 }
 
 /**
- * Saves an individual Pokémon's details.
+ * Writes the details and timestamp for this Pokémon ID.
  */
 export async function savePokemonDetail(
   db: SQLiteDatabase,
@@ -83,9 +81,7 @@ export async function savePokemonDetail(
 }
 
 /**
- * Retrieves cached Pokémon details by ID.
- *
- * Returns null when the Pokémon has not been cached.
+ * Returns cached details by Pokémon ID, or null when that ID has no cache entry.
  */
 export async function getCachedPokemonDetail(
   db: SQLiteDatabase,
