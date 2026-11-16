@@ -22,6 +22,7 @@ import {
   screen,
   fireEvent,
 } from "@testing-library/react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Screen
 import ListScreen from "./ListScreen";
@@ -143,6 +144,7 @@ describe("ListScreen", () => {
     expect(
       screen.getByText("Loading Pokémon...")
     ).toBeTruthy();
+    expect(screen.getByRole("header", { name: "Pokedex" })).toBeTruthy();
 
   });
 
@@ -151,9 +153,23 @@ describe("ListScreen", () => {
    */
   it("renders the Pokémon list", async () => {
 
-    await render(
-      <ListScreen navigation={navigation} route={route} />
+    const { root } = await render(
+      <SafeAreaProvider
+        initialMetrics={{
+          frame: { x: 0, y: 0, width: 360, height: 640 },
+          insets: { top: 24, bottom: 16, left: 8, right: 12 },
+        }}
+      >
+        <ListScreen navigation={navigation} route={route} />
+      </SafeAreaProvider>
     );
+    expect(root).toHaveStyle({
+      paddingTop: 24,
+      paddingBottom: 16,
+      paddingLeft: 8,
+      paddingRight: 12,
+    });
+    expect(screen.getByRole("header", { name: "Pokedex" })).toBeTruthy();
     await measureCarousel();
 
     expect(
@@ -184,6 +200,7 @@ describe("ListScreen", () => {
     expect(
       screen.getByText("Network unavailable")
     ).toBeTruthy();
+    expect(screen.getByRole("header", { name: "Pokedex" })).toBeTruthy();
 
   });
 
@@ -318,6 +335,7 @@ describe("ListScreen", () => {
     expect(
       screen.getByText("No Pokémon found.")
     ).toBeTruthy();
+    expect(screen.getByRole("header", { name: "Pokedex" })).toBeTruthy();
 
   });
 
